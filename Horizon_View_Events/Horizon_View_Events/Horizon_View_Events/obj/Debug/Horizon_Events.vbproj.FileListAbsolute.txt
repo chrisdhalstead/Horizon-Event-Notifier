@@ -1,0 +1,11 @@
+C:\Users\chalstead\Documents\GitHub\Horizon-Event-Notifier\Horizon_View_Events\Horizon_View_Events\Horizon_View_Events\bin\Debug\Horizon_Event_Notifier.exe
+C:\Users\chalstead\Documents\GitHub\Horizon-Event-Notifier\Horizon_View_Events\Horizon_View_Events\Horizon_View_Events\bin\Debug\Horizon_Event_Notifier.pdb
+C:\Users\chalstead\Documents\GitHub\Horizon-Event-Notifier\Horizon_View_Events\Horizon_View_Events\Horizon_View_Events\bin\Debug\Horizon_Event_Notifier.xml
+C:\Users\chalstead\Documents\GitHub\Horizon-Event-Notifier\Horizon_View_Events\Horizon_View_Events\Horizon_View_Events\obj\Debug\Horizon_Event_Notifier.Form1.resources
+C:\Users\chalstead\Documents\GitHub\Horizon-Event-Notifier\Horizon_View_Events\Horizon_View_Events\Horizon_View_Events\obj\Debug\Horizon_Event_Notifier.Resources.resources
+C:\Users\chalstead\Documents\GitHub\Horizon-Event-Notifier\Horizon_View_Events\Horizon_View_Events\Horizon_View_Events\obj\Debug\Horizon_Events.vbproj.GenerateResource.cache
+C:\Users\chalstead\Documents\GitHub\Horizon-Event-Notifier\Horizon_View_Events\Horizon_View_Events\Horizon_View_Events\obj\Debug\Horizon_Events.vbproj.CoreCompileInputs.cache
+C:\Users\chalstead\Documents\GitHub\Horizon-Event-Notifier\Horizon_View_Events\Horizon_View_Events\Horizon_View_Events\obj\Debug\Horizon_Event_Notifier.exe
+C:\Users\chalstead\Documents\GitHub\Horizon-Event-Notifier\Horizon_View_Events\Horizon_View_Events\Horizon_View_Events\obj\Debug\Horizon_Event_Notifier.xml
+C:\Users\chalstead\Documents\GitHub\Horizon-Event-Notifier\Horizon_View_Events\Horizon_View_Events\Horizon_View_Events\obj\Debug\Horizon_Event_Notifier.pdb
+C:\Users\chalstead\Documents\GitHub\Horizon-Event-Notifier\Horizon_View_Events\Horizon_View_Events\Horizon_View_Events\bin\Debug\app.config

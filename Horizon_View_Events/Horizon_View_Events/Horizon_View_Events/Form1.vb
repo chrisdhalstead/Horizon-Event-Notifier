@@ -1,13 +1,13 @@
-﻿Imports System.Management
+﻿Imports System.Managementtify
 Imports System.Data.SqlClient
 Imports System.Net.Mail
 Imports System.Text
-Imports Horizon_View_Event_Notifier.crypto
+Imports Horizon_Event_Notifier.crypto
 Imports System.Configuration
-Imports Horizon_View_Event_Notifier.encrypt_config
+Imports Horizon_Event_Notifier.encrypt_config
 Imports System.Xml
-Imports Horizon_View_Event_Notifier.ListViewColumnSorter
-Imports Horizon_View_Event_Notifier.RandomKeyGenerator
+Imports Horizon_Event_Notifier.ListViewColumnSorter
+Imports Horizon_Event_Notifier.RandomKeyGenerator
 
 Public Class Form1
     Const cAuditFail = "AUDIT_FAIL"
@@ -17,7 +17,7 @@ Public Class Form1
     Public nitem As New ListViewItem
     Public bsilent As Boolean = False
     Public aevents As New ArrayList
-    Public lvwColumnSorter As New Horizon_View_Event_Notifier.ListViewColumnSorter
+    Public lvwColumnSorter As New Horizon_Event_Notifier.ListViewColumnSorter
     Public bauditfail As Boolean
     Public bwarning As Boolean
     Public berror As Boolean
@@ -27,6 +27,10 @@ Public Class Form1
     Public aeventtypes As New ArrayList
     Public aselectedeventtypes As New ArrayList
     Public bupdatingsql As Boolean = False
+    Public sqltz As TimeZoneInfo
+    Public localtz As TimeZoneInfo
+    Public diff As TimeSpan
+    Public bplustime As Boolean = False
 
     Private Structure Args
         Dim sSilent As String
@@ -60,7 +64,7 @@ Public Class Form1
                 txtSendFrom.Text = My.Settings.SendFrom
                 txtTime.Text = My.Settings.Time
                 sslabel.Text = "Running"
-                NotifyIcon1.BalloonTipText = "Horizon View Event Notifier - RUNNING"
+                NotifyIcon1.BalloonTipText = "Horizon Event Notifier - RUNNING"
                 NotifyIcon1.ShowBalloonTip(50)
                 'execute_events()
                 btn_Start.Text = "Stop"
@@ -242,6 +246,62 @@ Public Class Form1
 
         End If
 
+        Try
+
+            Dim tzzommand As New SqlCommand
+
+            With tzzommand
+
+                .CommandText = "SELECT GETDATE();"
+                .Connection = dataconn
+
+            End With
+
+            Dim tzreader As SqlDataReader = tzzommand.ExecuteReader()
+
+            Dim tzsql As String = ""
+
+            If tzreader.HasRows = True Then
+
+                While tzreader.Read()
+
+                    tzsql = tzreader.Item(0)
+
+                End While
+
+            End If
+
+            Dim tz As Date
+            tz = tzsql
+
+            Dim ltime As Date = Now
+
+            Dim ssqltime As Long = tz.Ticks
+            Dim newtime As Long = Now.Ticks
+
+            If newtime > ssqltime Then
+
+                diff = ltime - tz        'Subtract start time from end time
+
+                bplustime = False
+
+            Else
+
+                diff = tz - ltime  'Subtract start time from end time
+
+                bplustime = True
+
+            End If
+
+            tzreader.Close()
+
+        Catch ex As Exception
+
+
+
+        End Try
+
+
         Dim myCommand As New SqlCommand()
 
         With myCommand
@@ -297,10 +357,30 @@ Public Class Form1
 
                         aevents.Add(reader.Item("eventid"))
 
+                        If bplustime = True Then
+
+                            Dim errortime As DateTime = sdate
+
+                            errortime = errortime - diff
+
+                            sdate = errortime
+
+
+                        Else
+
+                            Dim errortime As DateTime = sdate
+
+                            errortime = errortime + diff
+
+                            sdate = errortime
+
+                        End If
+
 
                         If send_email(sevent, sseverity, sserver, reader.Item("eventid"), seventtype, sdate) = "Sent" Then
 
                             'nitem.SubItems.Add("Sent")
+
                             nitem = lstEvents.Items.Add(sdate.ToString, 0)
 
                             bmailerror = False
@@ -383,7 +463,19 @@ Public Class Form1
 
     Function date_diff(ByVal stime As String) As DateTime
 
-        Dim dt As DateTime = DateTime.Now
+        Dim dt As DateTime
+
+        If bplustime = True Then
+
+            dt = DateTime.Now + diff
+
+
+        Else
+
+            dt = DateTime.Now - diff
+
+        End If
+
         Return dt.AddMinutes("-" & stime)
 
     End Function
@@ -531,7 +623,7 @@ Public Class Form1
 
             pop_sqldbs()
 
-            End If
+        End If
 
 
 
@@ -692,7 +784,7 @@ Public Class Form1
             btn_Start.Text = "Stop"
             Timer1.Enabled = True
 
-            NotifyIcon1.BalloonTipText = "Horizon View Events Notifier - RUNNING"
+            NotifyIcon1.BalloonTipText = "Horizon Events Notifier - RUNNING"
             NotifyIcon1.ShowBalloonTip(50)
 
         Else
@@ -701,7 +793,7 @@ Public Class Form1
             Timer1.Enabled = False
             sslabel.Text = "Idle"
 
-            NotifyIcon1.BalloonTipText = "Horizon View Events Notifier - STOPPED"
+            NotifyIcon1.BalloonTipText = "Horizon Events Notifier - STOPPED"
             NotifyIcon1.ShowBalloonTip(50)
 
         End If
@@ -768,7 +860,7 @@ Public Class Form1
             If Me.WindowState = FormWindowState.Minimized Then
                 Me.WindowState = FormWindowState.Minimized
                 NotifyIcon1.Visible = True
-                NotifyIcon1.BalloonTipText = "Horizon View Event Notifier - Running"
+                NotifyIcon1.BalloonTipText = "Horizon Event Notifier - Running"
                 Me.Hide()
             End If
         Catch ex As Exception
@@ -830,7 +922,7 @@ Public Class Form1
         omessage.From = New MailAddress(My.Settings.SendFrom)
         omessage.To.Add(My.Settings.Alert_Recipients)
         omessage.Subject = "TEST Message"
-        omessage.Body = "This is a test email from the Horizon View Event Notifier Application"
+        omessage.Body = "This is a test email from the Horizon Event Notifier Application"
 
         Try
 
@@ -868,7 +960,7 @@ Public Class Form1
 
     Private Sub AboutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AboutToolStripMenuItem.Click
 
-        MsgBox("Horizon View Event Notifier" & vbCrLf & "VMware Labs" & vbCrLf & """https://labs.vmware.com/flings/flings/horizon-view-event-notifier""" & vbCrLf & "Chris Halstead - chalstead@vmware.com" & vbCrLf & "Version: " & My.Application.Info.Version.ToString, MsgBoxStyle.Information + MsgBoxStyle.OkOnly, "About")
+        MsgBox("Horizon Event Notifier" & vbCrLf & "VMware Labs" & vbCrLf & """https://labs.vmware.com/flings/flings/horizon-view-event-notifier""" & vbCrLf & "Chris Halstead - chalstead@vmware.com" & vbCrLf & "Version: " & My.Application.Info.Version.ToString, MsgBoxStyle.Information + MsgBoxStyle.OkOnly, "About")
 
     End Sub
 
@@ -955,7 +1047,7 @@ Public Class Form1
     End Sub
 
 
-    Private Sub Form1_FormClosing(ByVal sender As Object, _
+    Private Sub Form1_FormClosing(ByVal sender As Object,
                               ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
         If e.CloseReason = CloseReason.UserClosing Then
             'The user has requested the form be closed so mimimise to the system tray instead.
@@ -1092,7 +1184,7 @@ Public Class Form1
 
 
 
-            End If
+        End If
 
 
     End Sub
@@ -1195,7 +1287,7 @@ Public Class Form1
 
     Private Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
 
-       Dim TabName As String
+        Dim TabName As String
 
         TabName = TabControl1.SelectedTab.Name
 
@@ -1290,31 +1382,31 @@ Public Class Form1
 
         Dim sencrypted As String = ""
         Dim bchanged As Boolean = False
-        Dim sek As String = read_config("Horizon_View_Event_Notifier.My.MySettings.EK")
-        Dim ssalt As String = read_config("Horizon_View_Event_Notifier.My.MySettings.Salt")
-        Dim siv As String = read_config("Horizon_View_Event_Notifier.My.MySettings.IV")
+        Dim sek As String = read_config("Horizon_Event_Notifier.My.MySettings.EK")
+        Dim ssalt As String = read_config("Horizon_Event_Notifier.My.MySettings.Salt")
+        Dim siv As String = read_config("Horizon_Event_Notifier.My.MySettings.IV")
 
         If sek = "" Or Len(sek) <> 16 Then
 
-            writeconfig("Horizon_View_Event_Notifier.My.MySettings.EK", getekey())
+            writeconfig("Horizon_Event_Notifier.My.MySettings.EK", getekey())
 
         End If
 
         If ssalt = "" Or Len(ssalt) <> 16 Then
 
-            writeconfig("Horizon_View_Event_Notifier.My.MySettings.Salt", getekey())
+            writeconfig("Horizon_Event_Notifier.My.MySettings.Salt", getekey())
 
         End If
 
         If siv = "" Or Len(siv) <> 16 Then
 
-            writeconfig("Horizon_View_Event_Notifier.My.MySettings.IV", getekey())
+            writeconfig("Horizon_Event_Notifier.My.MySettings.IV", getekey())
 
         End If
 
-        sek = read_config("Horizon_View_Event_Notifier.My.MySettings.EK")
-        ssalt = read_config("Horizon_View_Event_Notifier.My.MySettings.Salt")
-        siv = read_config("Horizon_View_Event_Notifier.My.MySettings.IV")
+        sek = read_config("Horizon_Event_Notifier.My.MySettings.EK")
+        ssalt = read_config("Horizon_Event_Notifier.My.MySettings.Salt")
+        siv = read_config("Horizon_Event_Notifier.My.MySettings.IV")
 
         Try
 
@@ -1346,9 +1438,9 @@ Public Class Form1
         End If
 
         Dim sdecrypted As String = ""
-        Dim sek As String = read_config("Horizon_View_Event_Notifier.My.MySettings.EK")
-        Dim ssalt As String = read_config("Horizon_View_Event_Notifier.My.MySettings.Salt")
-        Dim siv As String = read_config("Horizon_View_Event_Notifier.My.MySettings.IV")
+        Dim sek As String = read_config("Horizon_Event_Notifier.My.MySettings.EK")
+        Dim ssalt As String = read_config("Horizon_Event_Notifier.My.MySettings.Salt")
+        Dim siv As String = read_config("Horizon_Event_Notifier.My.MySettings.IV")
 
         Try
 
@@ -1599,6 +1691,11 @@ Public Class Form1
 
     End Function
 
+    Private Sub StatusStrip1_ItemClicked(sender As Object, e As ToolStripItemClickedEventArgs) Handles StatusStrip1.ItemClicked
 
+    End Sub
 
+    Private Sub Form1_MinimumSizeChanged(sender As Object, e As EventArgs) Handles Me.MinimumSizeChanged
+
+    End Sub
 End Class

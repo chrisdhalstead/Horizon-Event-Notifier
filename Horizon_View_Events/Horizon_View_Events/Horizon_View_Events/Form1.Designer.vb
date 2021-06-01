@@ -726,7 +726,7 @@ Partial Class Form1
         Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
         Me.TabPage1.Size = New System.Drawing.Size(982, 421)
         Me.TabPage1.TabIndex = 0
-        Me.TabPage1.Text = "Horizon View Events"
+        Me.TabPage1.Text = "Horizon Events"
         Me.TabPage1.UseVisualStyleBackColor = True
         '
         'lblMailError
@@ -924,6 +924,7 @@ Partial Class Form1
         Me.cmdProtect.TabIndex = 15
         Me.cmdProtect.Text = "Protect"
         Me.cmdProtect.UseVisualStyleBackColor = True
+        Me.cmdProtect.Visible = False
         '
         'cmdUnprotect
         '
@@ -933,6 +934,7 @@ Partial Class Form1
         Me.cmdUnprotect.TabIndex = 16
         Me.cmdUnprotect.Text = "Unprotect"
         Me.cmdUnprotect.UseVisualStyleBackColor = True
+        Me.cmdUnprotect.Visible = False
         '
         'Form1
         '
@@ -952,11 +954,12 @@ Partial Class Form1
         Me.Controls.Add(Me.MenuStrip1)
         Me.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MenuStrip1
         Me.MaximizeBox = False
         Me.Name = "Form1"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "Horizon View Event Notifier"
+        Me.Text = "Horizon Event Notifier"
         Me.ContextMenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
